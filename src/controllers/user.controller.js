@@ -31,6 +31,22 @@ const createUser = async (req, res) => {
             data: user,
         });
 
+        try {
+            const info = await transporter.sendMail({
+                from: '"Example Team" hloiamrajaroy@gmail.com', // sender address
+                to: "fortestingpurpose698@gmail.com", // list of recipients
+                subject: "Hello", // subject line
+                text: "Hello world?", // plain text body
+                html: "<b>Hello world?</b>", // HTML body
+            });
+
+            console.log("Message sent: %s", info.messageId);
+            // Preview URL is only available when using an Ethereal test account
+            console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+        } catch (err) {
+            console.error("Error while sending mail:", err);
+        }
+
     } catch (error) {
         return res.status(500).json({
             success: false,
