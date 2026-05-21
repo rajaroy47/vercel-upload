@@ -1,4 +1,6 @@
 import { User } from "../models/user.model.js";
+// FIX: Imported sendEmail alongside transporter
+import { transporter, sendEmail } from "../utils/nodemailer.js"; 
 
 const createUser = async (req, res) => {
     try {
@@ -25,27 +27,35 @@ const createUser = async (req, res) => {
             email,
         });
 
+        // FIX: Moved email trigger block ABOVE the JSON response so it actually runs
+        try {
+            await sendEmail({
+                to: email, // Send directly to the newly registered user
+                subject: "Welcome to our MERN Test Platform",
+                text: `Hello ${fullName}, your account has been successfully created.`,
+                html: `
+                <div style="font-family: sans-serif; padding: 20px; color: #333;">
+                    <h2 style="color: #4f46e5;">Welcome Aboard, ${fullName}!</h2>
+                    <p>Hey there,</p>
+                    <p>Your user profile has been successfully built on our standalone MERN test stack hosted on Vercel.</p>
+                    <blockquote style="background: #f3f4f6; padding: 10px 15px; border-left: 4px solid #4f46e5;">
+                        <strong>Registered Email:</strong> ${email}
+                    </blockquote>
+                    <p style="font-size: 0.85rem; color: #666;">Generated automatically from Vercel Serverless Engine.</p>
+                </div>
+                `
+            });
+        } catch (emailError) {
+            // Log error but don't crash the request execution
+            console.error("Email delivery skipped/failed:", emailError.message);
+        }
+
+        // FIX: Now we safely return our JSON response after the mail loop finishes
         return res.status(201).json({
             success: true,
             message: "User created successfully",
             data: user,
         });
-
-        try {
-            const info = await transporter.sendMail({
-                from: '"Example Team" hloiamrajaroy@gmail.com', // sender address
-                to: "fortestingpurpose698@gmail.com", // list of recipients
-                subject: "Hello", // subject line
-                text: "Hello world?", // plain text body
-                html: "<b>Hello world?</b>", // HTML body
-            });
-
-            console.log("Message sent: %s", info.messageId);
-            // Preview URL is only available when using an Ethereal test account
-            console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
-        } catch (err) {
-            console.error("Error while sending mail:", err);
-        }
 
     } catch (error) {
         return res.status(500).json({
