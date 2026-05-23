@@ -2,40 +2,57 @@ import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST,
-  port: process.env.EMAIL_PORT, 
-  // FIX: Port 465 must be true, port 587 must be false
-  secure: Number(process.env.EMAIL_PORT) === 465, 
+  port: Number(process.env.EMAIL_PORT),
+
+  // 465 => true
+  // 587 => false
+  secure: Number(process.env.EMAIL_PORT) === 465,
+
   auth: {
-    user: process.env.EMAIL_USER, 
-    pass: process.env.EMAIL_PASS, 
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
   },
 });
 
+// Verify transporter
 if (process.env.NODE_ENV !== "production") {
   transporter.verify((error, success) => {
     if (error) {
-      console.error("Nodemailer transporter error:", error);
+      console.error("❌ Nodemailer Error:", error);
     } else {
-      console.log("Nodemailer is configured and ready to send emails");
+      console.log("✅ Email Server Ready");
     }
   });
 }
 
-const sendEmail = async (options) => {
-  const mailOptions = {
-    from: `"${process.env.EMAIL_FROM_NAME}" <${process.env.EMAIL_USER}>`, 
-    to: options.to,
-    subject: options.subject,
-    text: options.text,
-    html: options.html,
-  };
+const sendEmail = async ({
+  to,
+  subject,
+  text,
+  html,
+}) => {
+  try {
+    const mailOptions = {
+      from: `"${process.env.EMAIL_FROM_NAME}" <${process.env.EMAIL_USER}>`,
+      to,
+      subject,
+      text,
+      html,
+    };
 
-  const info = await transporter.sendMail(mailOptions);
-  return info;
+    const info = await transporter.sendMail(mailOptions);
+
+    console.log("✅ Email Sent:", info.messageId);
+
+    return info;
+  } catch (error) {
+    console.log("❌ Email Send Error:", error);
+
+    throw new Error("Failed to send email");
+  }
 };
 
-// Exporting both tools safely
 export {
-    transporter, 
-    sendEmail
+  transporter,
+  sendEmail
 };

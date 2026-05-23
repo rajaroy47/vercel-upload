@@ -27,28 +27,45 @@ const createUser = async (req, res) => {
             email,
         });
 
-        // FIX: Moved email trigger block ABOVE the JSON response so it actually runs
-        try {
-            await sendEmail({
-                to: email, // Send directly to the newly registered user
-                subject: "Welcome to our MERN Test Platform",
-                text: `Hello ${fullName}, your account has been successfully created.`,
-                html: `
-                <div style="font-family: sans-serif; padding: 20px; color: #333;">
-                    <h2 style="color: #4f46e5;">Welcome Aboard, ${fullName}!</h2>
-                    <p>Hey there,</p>
-                    <p>Your user profile has been successfully built on our standalone MERN test stack hosted on Vercel.</p>
-                    <blockquote style="background: #f3f4f6; padding: 10px 15px; border-left: 4px solid #4f46e5;">
-                        <strong>Registered Email:</strong> ${email}
-                    </blockquote>
-                    <p style="font-size: 0.85rem; color: #666;">Generated automatically from Vercel Serverless Engine.</p>
-                </div>
-                `
-            });
-        } catch (emailError) {
-            // Log error but don't crash the request execution
-            console.error("Email delivery skipped/failed:", emailError.message);
-        }
+        await sendEmail({
+        to: email,
+
+        subject: "Welcome to MERN TEST APP",
+
+        text: `Hello ${fullName}, Welcome to MERN TEST APP`,
+
+        html: `
+            <div style="font-family: Arial; padding: 20px;">
+            <h2>Welcome ${fullName}</h2>
+
+            <p>
+                Thank you for registering with
+                <strong>MERN TEST APP</strong>
+            </p>
+
+            <p>
+                Your account has been created successfully.
+            </p>
+
+            <br>
+
+            <a 
+                href="https://lavender-lark-113297.hostingersite.com/"
+                style="
+                background: #2563eb;
+                color: white;
+                padding: 12px 20px;
+                text-decoration: none;
+                border-radius: 5px;
+                display: inline-block;
+                "
+            >
+                Visit Website
+            </a>
+            </div>
+        `,
+        });
+        
 
         // FIX: Now we safely return our JSON response after the mail loop finishes
         return res.status(201).json({
