@@ -1,6 +1,6 @@
 import { User } from "../models/user.model.js";
 // FIX: Imported sendEmail alongside transporter
-import { transporter, sendEmail } from "../utils/nodemailer.js"; 
+import { transporter, sendEmail } from "../utils/nodemailerUtil.js"; 
 
 const createUser = async (req, res) => {
     try {
@@ -28,27 +28,21 @@ const createUser = async (req, res) => {
         });
 
         await sendEmail({
+
         to: email,
-
         subject: "Welcome to MERN TEST APP",
-
         text: `Hello ${fullName}, Welcome to MERN TEST APP`,
-
         html: `
             <div style="font-family: Arial; padding: 20px;">
             <h2>Welcome ${fullName}</h2>
-
             <p>
                 Thank you for registering with
                 <strong>MERN TEST APP</strong>
             </p>
-
             <p>
                 Your account has been created successfully.
             </p>
-
             <br>
-
             <a 
                 href="https://lavender-lark-113297.hostingersite.com/"
                 style="
